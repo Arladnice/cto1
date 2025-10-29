@@ -36,24 +36,53 @@ axios.interceptors.response.use(
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
+            
+            // Проверяем, что refresh token ещё валиден
+            if (!keycloak.refreshToken || keycloak.isTokenExpired(5)) {
+                // Refresh token истёк или отсутствует - необходима повторная авторизация
+                console.warn('Refresh token истёк, требуется повторная авторизация');
+                
+                // Очищаем состояние пользователя
+                useStoreAuth.getState().setUser(null);
+                
+                // Очищаем токены в keycloak
+                keycloak.clearToken();
+                
+                // Перенаправляем на страницу логина
+                window.location.href = keycloak.createLoginUrl({
+                    redirectUri: window.location.origin + window.location.pathname
+                });
+                
+                return Promise.reject(new Error('Сессия истекла, требуется повторная авторизация'));
+            }
+            
             try {
-                await keycloak.updateToken(30);
-                originalRequest.headers.Authorization = `Bearer ${keycloak.token}`;
-                return axios(originalRequest);
+                // Пытаемся обновить токен
+                const refreshed = await keycloak.updateToken(30);
+                
+                if (refreshed && keycloak.token) {
+                    // Токен успешно обновлён
+                    originalRequest.headers.Authorization = `Bearer ${keycloak.token}`;
+                    return axios(originalRequest);
+                } else {
+                    // Обновление не произошло или токен отсутствует
+                    throw new Error('Токен не был обновлён');
+                }
             } catch (refreshError) {
                 // Токен не удалось обновить (refresh token истёк или невалиден)
-                // Перенаправляем на страницу логина вместо logout (который вызывает перезагрузку)
                 console.warn('Не удалось обновить токен, перенаправление на страницу входа');
                 
                 // Очищаем состояние пользователя
                 useStoreAuth.getState().setUser(null);
                 
-                // Перенаправляем на страницу логина без перезагрузки
-                keycloak.login().catch((loginError) => {
-                    console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+                // Очищаем токены в keycloak
+                keycloak.clearToken();
+                
+                // Перенаправляем на страницу логина через изменение URL (без перезагрузки через logout)
+                window.location.href = keycloak.createLoginUrl({
+                    redirectUri: window.location.origin + window.location.pathname
                 });
                 
-                // Возвращаем rejected promise без дальнейшего распространения
                 return Promise.reject(new Error('Сессия истекла, требуется повторная авторизация'));
             }
         }
@@ -65,9 +94,8 @@ keycloak
     .init({
         onLoad: 'login-required',
         checkLoginIframe: false,
-        // Включаем автоматическое обновление токена за 30 секунд до истечения
         enableLogging: false,
-    }) // или 'check-sso'
+    })
     .then((authenticated: any) => {
         if (authenticated) {
             createRoot(document.getElementById('root')!).render(
@@ -84,18 +112,37 @@ keycloak
             };
 
             useStoreAuth.getState().setUser(userData);
+            
+            // Настраиваем автоматическое обновление токена
+            // Обновляем токен каждые 30 секунд, если до истечения осталось меньше 60 секунд
+            setInterval(() => {
+                keycloak.updateToken(60).then((refreshed) => {
+                    if (refreshed) {
+                        console.log('Токен был обновлён автоматически');
+                    }
+                }).catch(() => {
+                    console.error('Не удалось обновить токен автоматически, сессия истекла');
+                    // Очищаем состояние
+                    useStoreAuth.getState().setUser(null);
+                    keycloak.clearToken();
+                    // Перенаправляем на логин
+                    window.location.href = keycloak.createLoginUrl({
+                        redirectUri: window.location.origin + window.location.pathname
+                    });
+                });
+            }, 30000); // проверяем каждые 30 секунд
         } else {
             console.error('Пользователь не аутентифицирован');
             // Перенаправляем на страницу логина
-            keycloak.login().catch((loginError) => {
-                console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+            window.location.href = keycloak.createLoginUrl({
+                redirectUri: window.location.origin + window.location.pathname
             });
         }
     })
     .catch((error) => {
         console.error('Ошибка инициализации Keycloak:', error);
         // Пытаемся перенаправить на страницу логина при ошибке инициализации
-        keycloak.login().catch((loginError) => {
-            console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+        window.location.href = keycloak.createLoginUrl({
+            redirectUri: window.location.origin + window.location.pathname
         });
     });
