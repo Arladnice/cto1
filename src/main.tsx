@@ -41,8 +41,20 @@ axios.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${keycloak.token}`;
                 return axios(originalRequest);
             } catch (refreshError) {
-                keycloak.logout();
-                return Promise.reject(refreshError);
+                // Токен не удалось обновить (refresh token истёк или невалиден)
+                // Перенаправляем на страницу логина вместо logout (который вызывает перезагрузку)
+                console.warn('Не удалось обновить токен, перенаправление на страницу входа');
+                
+                // Очищаем состояние пользователя
+                useStoreAuth.getState().setUser(null);
+                
+                // Перенаправляем на страницу логина без перезагрузки
+                keycloak.login().catch((loginError) => {
+                    console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+                });
+                
+                // Возвращаем rejected promise без дальнейшего распространения
+                return Promise.reject(new Error('Сессия истекла, требуется повторная авторизация'));
             }
         }
         return Promise.reject(error);
@@ -53,6 +65,8 @@ keycloak
     .init({
         onLoad: 'login-required',
         checkLoginIframe: false,
+        // Включаем автоматическое обновление токена за 30 секунд до истечения
+        enableLogging: false,
     }) // или 'check-sso'
     .then((authenticated: any) => {
         if (authenticated) {
@@ -72,8 +86,16 @@ keycloak
             useStoreAuth.getState().setUser(userData);
         } else {
             console.error('Пользователь не аутентифицирован');
+            // Перенаправляем на страницу логина
+            keycloak.login().catch((loginError) => {
+                console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+            });
         }
     })
     .catch((error) => {
         console.error('Ошибка инициализации Keycloak:', error);
+        // Пытаемся перенаправить на страницу логина при ошибке инициализации
+        keycloak.login().catch((loginError) => {
+            console.error('Ошибка при перенаправлении на страницу входа:', loginError);
+        });
     });

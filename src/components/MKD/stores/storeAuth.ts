@@ -13,8 +13,8 @@ export interface IUserData {
 
 // Store state
 export interface IStoreAuth {
-    user: IUserData;
-    setUser: (user: IUserData) => void;
+    user: IUserData | null;
+    setUser: (user: IUserData | null) => void;
     clearUser: () => void;
 }
 
@@ -23,13 +23,17 @@ export const useStoreAuth = create<IStoreAuth>()(
         user: null,
         isAuthenticated: false,
 
-        setUser: (userAuth: IUserData) => {
+        setUser: (userAuth: IUserData | null) => {
             set((s: IStoreAuth) => {
                 return {...s, user: userAuth};
             });
         },
-        clearUser: () => set(() => {
-            keycloak.logout({redirectUri: window.location.origin});
-            return {user: null};
-        }),
+        clearUser: () => {
+            // Очищаем состояние пользователя
+            set(() => ({user: null}));
+            // Перенаправляем на страницу логина без перезагрузки через logout
+            keycloak.login().catch((error) => {
+                console.error('Ошибка при перенаправлении на страницу входа:', error);
+            });
+        },
     }), {name: 'state', version: 0}))
