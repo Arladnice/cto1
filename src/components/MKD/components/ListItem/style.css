@@ -1,0 +1,158 @@
+@charset "UTF-8";
+/* Цветовые переменные */
+:root {
+  /* Основные цвета */
+  --color-blue-primary: #006FBA;
+  --color-blue-light: #D0EDFD;
+  --color-blue-very-light: #F0F9FF;
+  --color-blue-lighter: #C5EAFF;
+  --color-green: #24C38E;
+  --color-white: #FFFFFF;
+  --color-transparent: transparent;
+  /* Серые цвета */
+  --color-gray-light: #E6E9EB;
+  --color-gray-medium: #B3BDC2;
+  --color-gray-lightest: #F2F4F4;
+  --color-gray-very-light: #F9F9F9;
+  --color-gray-dark: #405866;
+  --color-gray-very-dark: #1A3747;
+  /* Цвета ошибок/предупреждений */
+  --color-red-light: #FCEEEE;
+  /* Специальные цвета */
+  --color-blue-dark-alpha: #002033E5;
+}
+
+/*def*/
+.parent {
+  color: var(--color-gray-dark);
+}
+.parent rect {
+  fill: var(--color-transparent);
+  stroke: var(--color-gray-light);
+}
+.parent path {
+  stroke: var(--color-transparent);
+}
+
+.parent.checked {
+  background-color: var(--color-blue-very-light);
+}
+.parent.checked rect {
+  fill: var(--color-blue-primary);
+  stroke: var(--color-blue-primary);
+}
+.parent.checked path {
+  stroke: var(--color-white);
+}
+
+/*hover*/
+.parent:hover {
+  background-color: var(--color-gray-very-light);
+  color: var(--color-gray-very-dark);
+}
+.parent:hover rect {
+  fill: var(--color-transparent);
+  stroke: var(--color-blue-primary);
+}
+.parent:hover path {
+  stroke: var(--color-transparent);
+}
+
+.parent.checked:hover {
+  background-color: var(--color-blue-light);
+  color: var(--color-blue-dark-alpha);
+}
+.parent.checked:hover rect {
+  fill: var(--color-blue-light);
+  stroke: var(--color-blue-primary);
+}
+.parent.checked:hover path {
+  stroke: var(--color-blue-primary);
+}
+
+/*press*/
+.parent:active {
+  background-color: var(--color-gray-lightest);
+  color: var(--color-gray-very-dark);
+}
+.parent:active rect {
+  fill: var(--color-blue-light);
+  stroke: var(--color-blue-primary);
+}
+.parent:active path {
+  stroke: var(--color-blue-primary);
+}
+
+.parent.checked:active {
+  background-color: var(--color-blue-lighter);
+  color: var(--color-gray-very-dark);
+}
+.parent.checked:active rect {
+  fill: var(--color-transparent);
+  stroke: var(--color-blue-primary);
+}
+.parent.checked:active path {
+  stroke: var(--color-transparent);
+}
+
+/*disabled*/
+.parent.disabled {
+  background-color: var(--color-transparent);
+  color: var(--color-gray-medium);
+}
+.parent.disabled rect {
+  fill: var(--color-gray-light);
+  stroke: var(--color-gray-light);
+}
+.parent.disabled path {
+  stroke: var(--color-transparent);
+}
+
+.parent.checked.disabled {
+  background-color: var(--color-transparent);
+  color: var(--color-gray-medium);
+}
+.parent.checked.disabled rect {
+  fill: var(--color-gray-lightest);
+  stroke: var(--color-gray-light);
+}
+.parent.checked.disabled path {
+  stroke: var(--color-gray-medium);
+}
+
+/*blocked*/
+.parent.blocked {
+  background-color: var(--color-transparent);
+  color: var(--color-gray-dark);
+}
+.parent.blocked rect {
+  fill: var(--color-red-light);
+  stroke: var(--color-gray-light);
+}
+.parent.blocked path {
+  stroke: var(--color-transparent);
+}
+
+.parent.blocked:hover {
+  background-color: var(--color-gray-very-light);
+  color: var(--color-gray-very-dark);
+}
+
+.parent.blocked:active {
+  background-color: var(--color-red-light);
+  color: var(--color-gray-very-dark);
+}
+
+.parent.blocked.disabled {
+  background-color: var(--color-transparent);
+  color: var(--color-gray-medium);
+}
+.parent.blocked.disabled rect {
+  fill: var(--color-gray-light);
+  stroke: var(--color-gray-light);
+}
+.parent.blocked.disabled path {
+  stroke: var(--color-transparent);
+}
+
+/*# sourceMappingURL=style.css.map */

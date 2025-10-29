@@ -1,0 +1,11 @@
+/node_modules/
+/.idea/
+/.vite/
+/tmp/
+~*
+*/dist
+/tsconfig.app.tsbuildinfo
+/tsconfig.node.tsbuildinfo
+/dist/
+.env
+coverage/

@@ -1,0 +1,127 @@
+@charset "UTF-8";
+@import "tailwindcss";
+/*@custom-variant dark (&:where(.dark, .dark *));*/
+@theme {
+  --color-st-white: #fff;
+}
+@layer components {
+  .thin-border {
+    @apply outline-1 -outline-offset-1;
+  }
+}
+.hatching {
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0) 49.9%, #939393 49.9%, #939393 60%, rgba(0, 0, 0, 0) 60%) fixed, linear-gradient(45deg, #939393 10%, rgba(0, 0, 0, 0) 10%) fixed;
+  background-size: 0.5em 0.5em;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+.no-resize {
+  resize: none;
+}
+
+.no-select {
+  -webkit-user-select: none;
+}
+
+.ev-none {
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  height: 3px;
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0F2F3;
+  width: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 32, 51, 0.1019607843);
+  border-radius: 4px;
+  border: transparent;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
+}
+.rotY {
+  animation: spin 1s infinite linear;
+}
+
+.zoom-out-container {
+  position: relative;
+}
+
+.zoom-out {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  animation: growDisappear 0.5s ease;
+}
+
+@keyframes growDisappear {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  99.9% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+.header-set {
+  outline: 1px dashed #6c6c6c;
+}
+
+.two-columns {
+  display: grid;
+  grid-template-columns: auto auto; /* Две колонки */
+  gap: 5px; /* Расстояние между колонками */
+  /*align-items: start; !* Выравнивание по верхнему краю *!*/
+  height: 100%;
+}
+
+.two-columns > * {
+  min-height: 100%;
+  overflow-y: auto;
+  outline: 1px solid gray;
+  outline-offset: -1px;
+}
+
+/* Уберем спинер на Input number lля WebKit: Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* и для Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/*# sourceMappingURL=style.css.map */
